@@ -12,10 +12,20 @@ let allCountries = [];
  *
  * @returns {Promise<Array>} Le tableau de tous les pays.
  */
-async function fetchCountries() {
-  // TODO
+function fetchCountries() {
+  fetch(API_URL)
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+            allCountries = data;
+            displayCountries(allCountries)
+            console.log(allCountries)
+        })
+        .catch((error) => {
+            console.error(error);
+        })
 }
-
 /**
  * Crée la carte HTML d'un pays, sur le modèle de la maquette :
  * drapeau (avec un texte alternatif utile), nom, capitale, population.
@@ -24,7 +34,37 @@ async function fetchCountries() {
  * @returns {HTMLElement} La carte, prête à être ajoutée à la grille.
  */
 function createCountryCard(country) {
-  // TODO
+  let article = document.createElement("article");
+  article.className = "my-5 w-full max-w-sm bg-white border border-[#D9E0E8] rounded-lg overflow-hidden"
+  let img = document.createElement("img")
+  img.className = "w-full h-48 object-cover bg-[#E5EBF3]"
+  img.src = country.flags.png
+
+  let div = document.createElement("div");
+  div.className = "p-5 leading-8"
+  let p = document.createElement("p")
+  p.className = "text-2xl font-semibold mb-2"
+  p.textContent = country.name;
+
+  let divCapital = document.createElement("div");
+  divCapital.className = "flex justify-between"
+  let cap = document.createElement("span");
+  cap.textContent = "capital";
+  let capName = document.createElement("span");
+  capName.textContent = country.capital;
+  divCapital.append(cap,capName);
+
+  let divPeapol = document.createElement("div");
+  divPeapol.className = "flex justify-between"
+  let peap = document.createElement("span");
+  peap.textContent = "Population";
+  let peapNum = document.createElement("span");
+  peapNum.textContent = country.population;
+  divPeapol.append(peap,peapNum);
+  
+  div.append(p,divCapital,divPeapol);
+  article.append(img,div);
+  return article;
 }
 
 /**
@@ -36,7 +76,11 @@ function createCountryCard(country) {
  * @param {Array} countries - Les pays à afficher.
  */
 function displayCountries(countries) {
-  // TODO
+  articles = document.getElementById("articles")
+
+  allCountries.forEach((country)=>{
+    articles.append(createCountryCard(country));
+  });
 }
 
 /**
@@ -47,10 +91,25 @@ function displayCountries(countries) {
  *
  * Aucune requête vers l'API ici !
  */
+let searchInput = document.getElementById("search");
+let filterSelect = document.getElementById("continent");
 function filterCountries() {
-  // TODO
-}
+  let select = filterSelect.value
+  let search = searchInput.value.trim().toLowerCase();
 
+  let filtredCountys = allCountries.filter((country) => {
+    let continent = country.region == select;
+    let searched = country.name.toLowerCase().includes(search);
+
+    return continent && searched
+  });
+
+  displayCountries(filtredCountys);
+
+}
+searchInput.addEventListener("input" , ()=>{
+    filterCountries();
+  })
 
 // ------------------------------------------------------------
 // BONUS
@@ -99,7 +158,10 @@ function showError(message) {
  * (Bonus) Gère le chargement et les erreurs avec try...catch.
  */
 async function init() {
-  // TODO
+  // TODO\
+  
+  fetchCountries()
+  
 }
 
 init();
